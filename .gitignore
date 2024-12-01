@@ -3,6 +3,8 @@
 # User specific
 **/.idea/**
 
+src/Inputs/**.txt
+
 *.suo
 *.user
 .vs/
