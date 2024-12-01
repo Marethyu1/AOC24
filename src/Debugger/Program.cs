@@ -4,8 +4,9 @@ using Helpers;
 using Solutions.Day1;
 
 
-var inputFile = FilePathHelper.GetFullFilePath("1_basic.txt");
+var inputFile = FilePathHelper.GetFullFilePath("1_full.txt");
 
 var solution = Day1Solution.LoadSolution(inputFile);
 
-solution.SolvePart1();
+Console.WriteLine(solution.SolvePart1());
+Console.WriteLine(solution.SolvePart2());
