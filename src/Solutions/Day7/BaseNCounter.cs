@@ -35,13 +35,13 @@ public class BaseNCounter
     {
         _baseNumber = baseNumber;
         _width = width;
-        for (var i = 0; i < _width; i++)
+        for (var i = 0; i < _width + 1; i++)
         {
             _queue.Add(new BaseNumber(_baseNumber));
         }
     }
     
-    public string Value => string.Join("", _queue.Select(x => x.Value).Reverse()); 
+    public string Value => string.Join("", _queue.Take(_width).Select(x => x.Value).Reverse()); 
 
     public string NextValue()
     {

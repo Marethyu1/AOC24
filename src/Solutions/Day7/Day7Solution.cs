@@ -6,6 +6,7 @@ public enum Operation
 {
     Add, 
     Multiply,
+    Concat,
 }
 
 public class Day7Solution(IEnumerable<Equation> equations) : ISolution
@@ -14,9 +15,14 @@ public class Day7Solution(IEnumerable<Equation> equations) : ISolution
     public long SolvePart1()
     {
         long sum = 0;
+        var operations = new[]
+        {
+            Operation.Add,
+            Operation.Multiply
+        };
         foreach (var equation in equations)
         {
-            if (CanSolveEquation(equation))
+            if (CanSolveEquation(equation,operations))
             {
                 sum += equation.Total;
             }
@@ -25,11 +31,12 @@ public class Day7Solution(IEnumerable<Equation> equations) : ISolution
         return sum;
     }
 
-    private bool CanSolveEquation(Equation equation)
+    public static bool CanSolveEquation(Equation equation, Operation[] operations)
     {
         var equationValues = equation.Values;
+        
         var perms = PermutationGenerator<Operation>.
-            GetPermutationsV2(Operation.Add, Operation.Multiply, equationValues.Length - 1)
+            GetPermutationsV3(operations, equationValues.Length - 1)
             .ToList();
         
         foreach (var perm in perms)
@@ -38,13 +45,10 @@ public class Day7Solution(IEnumerable<Equation> equations) : ISolution
             for (var i = 1; i < equation.Values.Length; i++)
             {
                 var operation = perm[i - 1];
-                if (operation == Operation.Add)
+                total = Apply(operation, total, equationValues[i]);
+                if (total > equation.Total)
                 {
-                    total += equationValues[i];
-                }
-                if (operation == Operation.Multiply)
-                {
-                    total *= equationValues[i];
+                    break;
                 }
             }
 
@@ -56,9 +60,35 @@ public class Day7Solution(IEnumerable<Equation> equations) : ISolution
         return false;
     }
 
+    private static long Apply(Operation operation, long lhs, long rhs)
+    {
+        return operation switch
+        {
+            Operation.Add => lhs + rhs,
+            Operation.Multiply => lhs * rhs,
+            Operation.Concat => long.Parse(string.Join("", lhs.ToString().Concat(rhs.ToString()))),
+            _ => throw new ArgumentOutOfRangeException(nameof(operation), operation, null)
+        };
+    }
+
     public long SolvePart2()
     {
-        throw new NotImplementedException();
+        long sum = 0;
+        var operations = new[]
+        {
+            Operation.Add,
+            Operation.Multiply,
+            Operation.Concat
+        };
+        foreach (var equation in equations)
+        {
+            if (CanSolveEquation(equation,operations))
+            {
+                sum += equation.Total;
+            }
+        }
+
+        return sum;
     }
 
     public static Day7Solution LoadSolution(string basicInput)

@@ -15,18 +15,6 @@ public class PermutationGenerator<T>
     //   y, y, x
     //   y, y, y
     //   y, x, y
-    public static IEnumerable<T[]> GetPermutations(T[] numbers, int length)
-    {
-        foreach (var n in numbers)
-        {
-            var array = new T[length];
-            foreach (var _ in Enumerable.Range(0, length))
-            {
-                array[_] = n;
-            }
-            yield return array;    
-        }
-    }
     
     public static IEnumerable<T[]> GetPermutationsV2(T t1, T t2, int length)
     {
@@ -46,14 +34,14 @@ public class PermutationGenerator<T>
         }
     }
     
-    public static IEnumerable<T[]> GetPermutationsV3(T[] options)
+    public static IEnumerable<T[]> GetPermutationsV3(T[] options, int length)
     {
-        var counter = new BaseNCounter(options.Length, options.Length);
-        var amountOfPermutations = Math.Pow(2, options.Length);
+        var counter = new BaseNCounter(options.Length, length);
+        var amountOfPermutations = Math.Pow(options.Length, length);
         for (var i = 0; i < amountOfPermutations; i++)
         {
             var permutation = counter.Value;
-            var permutationArray = new T[options.Length];
+            var permutationArray = new T[length];
             
             for (var j = 0; j < permutationArray.Length; j++)
             {
@@ -61,6 +49,7 @@ public class PermutationGenerator<T>
                 permutationArray[j] = options[asIndex];; 
             }
             yield return permutationArray;
+            counter.NextValue();
         }
     }
 

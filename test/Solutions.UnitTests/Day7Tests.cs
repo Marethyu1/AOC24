@@ -4,38 +4,6 @@ namespace Solutions.UnitTests;
 
 public class Day7Tests
 {
-    [Fact]
-    public void CanGenerate1Permutation()
-    {
-        var perms = PermutationGenerator<int>.GetPermutations([1], 1)
-            .ToList();
-        
-        Assert.Equal(1, perms.Count);
-        Assert.Equal(1, perms[0][0]);
-    }
-    
-    [Fact]
-    public void CanGenerate2Permutations()
-    {
-        var perms = PermutationGenerator<int>.GetPermutations([1, 2], 1)
-            .ToList();
-        Assert.Contains([1], perms);
-        Assert.Contains([2], perms);
-        Assert.Equal(2, perms.Count);
-    }
-    
-    [Fact]
-    public void CanGenerate3Permutations()
-    {
-        var perms = PermutationGenerator<int>.GetPermutations([1, 2], 2)
-            .ToList();
-        Assert.Contains([1, 1], perms);
-        Assert.Contains([1, 2], perms);
-        Assert.Contains([2, 2], perms);
-        Assert.Contains([2, 1], perms);
-        Assert.Equal(4, perms.Count);
-    }
-    
     
     [Fact]
     public void CanGenerate3PermutationsV2()
@@ -77,12 +45,7 @@ public class Day7Tests
         Assert.Contains([Operation.Add], perms);
         Assert.Contains([Operation.Multiply], perms);
     }
-
-    [Fact]
-    public void ToBase()
-    {
-        Assert.Equal("10", Convert.ToString(4, 3));
-    }
+    
 
     [Fact]
     public void TernaryCounter()
@@ -95,6 +58,15 @@ public class Day7Tests
         Assert.Equal(2, number.Value);
         number.Increment();
         Assert.Equal(0, number.Value);
+    }
+
+    [Fact]
+    public void ConCat()
+    {
+        var lhs = 48;
+        var rhs = 6;
+        var res = long.Parse(string.Join("", lhs.ToString().Concat(rhs.ToString())));
+        Assert.Equal(486, res);
     }
 
     [Fact]
@@ -121,5 +93,24 @@ public class Day7Tests
             quickMath.NextValue();
         }
         Assert.Equal("2000", quickMath.Value);
+    }
+
+    [Fact]
+    public void CanSolveThis()
+    {
+        var eq = new Equation(156, [15, 6]);
+        var operations = new[]
+        {
+            Operation.Add, Operation.Multiply, Operation.Concat  
+        };
+        var canSolve = Day7Solution.CanSolveEquation(eq, operations);
+        
+        var perms = PermutationGenerator<Operation>.
+            GetPermutationsV3(operations, eq.Values.Length - 1)
+            .ToList();
+        
+        Assert.Contains([Operation.Add], perms);
+        
+        Assert.True(canSolve);
     }
 }
