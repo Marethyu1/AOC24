@@ -45,7 +45,7 @@ public class Grid<T>
                 throw new CoordinateOutOfGridException(coord);
             }
         }
-        protected set => Input[coord.R][coord.C] = value;
+        set => Input[coord.R][coord.C] = value;
     }
 
     public bool InBounds(Coord coord)
