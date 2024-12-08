@@ -36,20 +36,21 @@ public class PermutationGenerator<T>
     
     public static IEnumerable<T[]> GetPermutationsV3(T[] options, int length)
     {
-        var counter = new BaseNCounter(options.Length, length);
+        var counter = new BaseNCounterFast(options.Length, length);
         var amountOfPermutations = Math.Pow(options.Length, length);
+        
         for (var i = 0; i < amountOfPermutations; i++)
         {
-            var permutation = counter.Value;
             var permutationArray = new T[length];
+            var permutation = counter.Values;
             
             for (var j = 0; j < permutationArray.Length; j++)
             {
-                var asIndex = int.Parse(permutation[j].ToString());
+                var asIndex = permutation[permutationArray.Length - j];
                 permutationArray[j] = options[asIndex];; 
             }
             yield return permutationArray;
-            counter.NextValue();
+            counter.Next();
         }
     }
 

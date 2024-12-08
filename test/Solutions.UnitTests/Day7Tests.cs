@@ -113,4 +113,15 @@ public class Day7Tests
         
         Assert.True(canSolve);
     }
+
+    [Fact]
+    public void FastCounter()
+    {
+        var counter = new BaseNCounterFast(3, 4);
+        Assert.Equal([0, 0, 0, 0, 0], counter.Values);
+        Assert.Equal([0, 0, 0, 0, 1], counter.Next());
+        Assert.Equal([0, 0, 0, 0, 2], counter.Next());
+        Assert.Equal([0, 0, 0, 1, 0], counter.Next());
+        Assert.Equal([0, 0, 0, 1, 1], counter.Next());
+    }
 }
