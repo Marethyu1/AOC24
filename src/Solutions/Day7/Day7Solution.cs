@@ -35,11 +35,8 @@ public class Day7Solution(IEnumerable<Equation> equations) : ISolution
     {
         var equationValues = equation.Values;
         
-        var perms = PermutationGenerator<Operation>.
-            GetPermutationsV3(operations, equationValues.Length - 1)
-            .ToList();
-        
-        foreach (var perm in perms)
+        foreach (var perm in PermutationGenerator<Operation>.
+                     GetPermutationsV3(operations, equationValues.Length - 1))
         {
             var total = equationValues[0];
             for (var i = 1; i < equation.Values.Length; i++)
@@ -66,7 +63,7 @@ public class Day7Solution(IEnumerable<Equation> equations) : ISolution
         {
             Operation.Add => lhs + rhs,
             Operation.Multiply => lhs * rhs,
-            Operation.Concat => long.Parse(string.Join("", lhs.ToString().Concat(rhs.ToString()))),
+            Operation.Concat => long.Parse($"{lhs}{rhs}"),
             _ => throw new ArgumentOutOfRangeException(nameof(operation), operation, null)
         };
     }
