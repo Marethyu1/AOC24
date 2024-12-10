@@ -2,6 +2,17 @@ namespace Solutions.Day7;
 
 public class PermutationGenerator<T>
 {
+    public static IEnumerable<Tuple<T, T>> GetPairings(T[] input)
+    {
+        for (var i = 0; i < input.Length; i++)
+        {
+            for (var j = i + 1; j < input.Length; j++)
+            {   
+                yield return new Tuple<T, T>(input[i], input[j]);
+            }
+        }
+    }
+    
     // X, Y
     // 1. x -> y 
     // 2. x , x -> x, y -> y, y -> y, y

@@ -16,6 +16,17 @@ public class Grid<T>
             }
         }
     }
+    
+    public IEnumerable<T> EnumerateValues()
+    {
+        for (var i = 0; i < Height; i++)
+        {
+            for (var j = 0; j < Width; j++)
+            {
+                yield return Input[i][j];
+            }
+        }
+    }
 
     public T this[int r, int c]
     {
