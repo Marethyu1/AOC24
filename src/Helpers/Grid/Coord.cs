@@ -24,4 +24,9 @@ public record Coord(int R, int C)
             _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
     }
+
+    public IEnumerable<Coord> AdjacentCoords(Direction[] directions)
+    {
+        return directions.Select(Next);
+    }
 }

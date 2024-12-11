@@ -7,11 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Day9\" />
-      <Folder Include="Day10\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Helpers\Helpers.csproj" />
     </ItemGroup>
 
