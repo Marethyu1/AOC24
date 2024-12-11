@@ -72,8 +72,52 @@ public class Day10Solution(Grid<int> grid) : ISolution
 
     public long SolvePart2()
     {
-        throw new NotImplementedException();
+        long count = 0;
+        foreach (var coord in grid.EnumerateCoords()
+                     .Where(c => grid[c] == StartValue))
+        {
+            var res = SearchV2(coord);
+            count += res;
+        }
+
+        return count;
     }
+    
+    private long SearchV2(Coord coord)
+    {
+        var start = grid[coord];
+        if (start != StartValue) return 0;
+
+        var peaks = 0;
+        var stack = new Stack<Coord>();
+        stack.Push(coord);
+
+        while (stack.Count > 0)
+        {
+            var current = stack.Pop();
+            if (grid[current] == Peak)
+            {
+                peaks++;
+            }
+
+            foreach (var coordToVisit in current.AdjacentCoords(AdjacentDirections))
+            {
+                if (!grid.InBounds(coordToVisit))
+                {
+                    continue;
+                }
+
+                if (grid[coordToVisit] != grid[current] + 1)
+                {
+                    continue;
+                }
+                stack.Push(coordToVisit);
+            }
+        }
+        return peaks;
+    }
+    
+    
 
 
     public static Day10Solution LoadSolution(string basicInput)
