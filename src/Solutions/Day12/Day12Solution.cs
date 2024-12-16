@@ -17,7 +17,7 @@ public class Day12Solution(Grid<char> grid) : ISolution
         Direction.NorthWest,
     ];
     
-    private static readonly Direction[] PlotDirections =
+    public static readonly Direction[] PlotDirections =
     [
         Direction.Up,
         Direction.Right,
@@ -36,61 +36,16 @@ public class Day12Solution(Grid<char> grid) : ISolution
                 continue;
             }
             
-            var plot = FindNeighbours(coord);
-            var perimeter = 0;
+            var plot = Plotter.FindNeighbours(coord, grid, PlotDirections);
             var searchTerm = grid[coord];
-            foreach (var currentPlotCoord in plot)
-            {
-                foreach (var adjacentCoord in currentPlotCoord.AdjacentCoords(PlotDirections))
-                {
-                    if (!grid.InBounds(adjacentCoord))
-                    {
-                        perimeter++;
-                    } else if (grid[adjacentCoord] != searchTerm)
-                    {
-                        perimeter++;
-                    }
-                }
-            }
+            var perimeter = Plotter.DeterminePerimeter(plot, grid, searchTerm, PlotDirections);
+            
             Console.WriteLine($"Visiting {grid[coord]}-{plot.Count}  {perimeter}");
             fullTotal += plot.Count * perimeter;
             
             superSet.UnionWith(plot);
         }
         return fullTotal;
-    }
-
-    private HashSet<Coord> FindNeighbours(Coord startCoord)
-    {
-        var visited = new HashSet<Coord>();
-        var startValue = grid[startCoord];
-        var stack = new Stack<Coord>();
-        stack.Push(startCoord);
-
-        while (stack.Count > 0)
-        {
-            var currentCoord = stack.Pop();
-            if (!visited.Add(currentCoord))
-            {
-                continue;
-            }
-            foreach (var coordToVisit in currentCoord.AdjacentCoords(AdjacentDirections))
-            {
-                if (!grid.InBounds(coordToVisit))
-                {
-                    continue;
-                }
-
-                if (grid[coordToVisit] != startValue)
-                {
-                    continue;
-                }
-                stack.Push(coordToVisit);
-            }
-        }
-
-        return visited;
-
     }
 
     public long SolvePart2()

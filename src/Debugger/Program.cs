@@ -11,8 +11,8 @@ var basicSolution = Day12Solution.LoadSolution(basicInput);
 var fullSolution = Day12Solution.LoadSolution(fullInputFile);
 Console.WriteLine($"---{nameof(Day12Solution)}-basic-part-1---");
 Console.WriteLine(basicSolution.SolvePart1());
-// Console.WriteLine($"---{nameof(Day12Solution)}-full-part-1---");
-// Console.WriteLine(fullSolution.SolvePart1());
+Console.WriteLine($"---{nameof(Day12Solution)}-full-part-1---");
+Console.WriteLine(fullSolution.SolvePart1());
 //
 // Console.WriteLine("");
 // Console.WriteLine($"---{nameof(Day12Solution)}-basic-part-2---");
