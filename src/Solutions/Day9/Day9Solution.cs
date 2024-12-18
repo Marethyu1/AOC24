@@ -13,8 +13,9 @@ public record Block(long Size, BlockType Type)
 {
 };
 
-public record FileBlock(long Id, long Size) : Block(Size, BlockType.File)
+public record FileBlock(long Id, long Size, long InitialSpace) : Block(Size, BlockType.File)
 {
+    public Guid Guid = Guid.NewGuid();
     public string Debug => new(Id.ToString()[0], (int)Size);
 };
 
@@ -23,12 +24,13 @@ public record SingleFileBlock(long Id, long Value) : Block(1, BlockType.File)
     public string Debug => Value.ToString();
 };
 
-public record SpaceBlock(long Size) : Block(Size, BlockType.Space)
+public record SpaceBlock(long Size, long InitialSpace) : Block(Size, BlockType.Space)
 {
+    public Guid Guid = Guid.NewGuid();
     public string Debug => new('.', (int)Size);
 };
 
-public record SingleSpaceBlock() : SpaceBlock(1)
+public record SingleSpaceBlock() : SpaceBlock(1, 0)
 {
     
 }
@@ -60,11 +62,19 @@ public class OneOfBlockChunk : OneOfBase<FileBlock, SpaceBlock>
     }
 
     public bool IsFile => IsT0;
+    
+    public FileBlock AsFile => AsT0;
     public bool IsSpace => IsT1;
+    public SpaceBlock ASpaceBlock => AsT1;
 
     public string Debug()
     {
         return IsFile ? AsT0.Debug : AsT1.Debug;
+    }
+
+    public Guid Guid()
+    {
+        return IsFile ? AsFile.Guid : ASpaceBlock.Guid;
     }
     
     public static implicit operator OneOfBlockChunk(FileBlock input) => new(input);
@@ -123,134 +133,133 @@ public class Day9Solution(LinkedList<OneOfBlock> blocks, LinkedList<OneOfBlockCh
 
     public long SolvePart2()
     {
-        var rhsBlock = oneOfBlockChunks.Last;
-        var lhsIndex = 0;
-       
-       
-        var processed = new HashSet<long>();
-
-        while (rhsBlock!.Previous != null)
+        var reverseChunks = oneOfBlockChunks.ToArray().Reverse().ToArray();
+        foreach (FileBlock currentFile in reverseChunks.Where(file => file.IsFile).Select(file => file.AsFile))
         {
-            if (rhsBlock.Value.IsSpace)
+            // Console.WriteLine($"Processing {currentFile.Debug}");
+            SpaceBlock nextMemoryBlock;
+            try
             {
-                rhsBlock = rhsBlock.Previous;
+                nextMemoryBlock = NextEmptySpaceThatFits(oneOfBlockChunks.First, currentFile);
+            }
+            catch (Exception e)
+            {
+                // Console.WriteLine($"Cant find space for {currentFile.Debug}");
+                continue;
+            }
+
+            var counter = 0;
+            var memoryLocation = 0;
+            var fileLocation = 0;
+            foreach (var currentChunk in oneOfBlockChunks)
+            {
+                if (currentChunk.IsSpace && currentChunk.ASpaceBlock.Guid == nextMemoryBlock.Guid)
+                {
+                    memoryLocation = counter;
+                }
+
+                if (currentChunk.IsFile && currentChunk.AsFile.Guid == currentFile.Guid)
+                {
+                    fileLocation = counter;
+                }
+                counter++;
+            }
+
+            if (memoryLocation > fileLocation)
+            {
+                // Console.WriteLine($"skipping for space {currentFile.Debug}");
+                continue;
+            }
+
+
+            if (nextMemoryBlock.InitialSpace > currentFile.InitialSpace)
+            {
+                // Console.WriteLine($"skipping {currentFile.Debug}");
                 continue;
             }
             
-            var file = rhsBlock.Value.AsT0;
-            if (!processed.Add(file.Id))
+            
+            var freeMemoryBlock = Find(nextMemoryBlock.Guid);
+            var currentFileSpace = Find(currentFile.Guid);
+            var memoryRemaining = freeMemoryBlock.Value.ASpaceBlock.Size - currentFile.Size;
+            if (memoryRemaining > 0)
             {
-                rhsBlock = rhsBlock.Previous;
+                freeMemoryBlock.Value = currentFile;
+                var remainingMemory = new SpaceBlock(memoryRemaining, -1);
+                oneOfBlockChunks.AddAfter(freeMemoryBlock, remainingMemory);
+                currentFileSpace.Value = new SpaceBlock(currentFile.Size, -1);
+            }
+            else
+            {
+                freeMemoryBlock.Value = currentFile;
+                currentFileSpace.Value = new SpaceBlock(currentFile.Size, -1);
+            }
+            
+            // Print();
+        }
+
+        Print();
+        long index = 0;
+        long sum = 0;
+        foreach (var currentChunk in oneOfBlockChunks)
+        {
+            if (currentChunk.IsSpace)
+            {
+                index += currentChunk.ASpaceBlock.Size;
                 continue;
             }
-            
 
-            var lhsBlock = oneOfBlockChunks.First;
-            bool pastStart = false;
-            while (lhsBlock!.Value.IsFile && lhsBlock.Next != null)
+            for (var i = 0; i < currentChunk.AsFile.Size; i++)
             {
-                
-                lhsBlock = lhsBlock.Next;
-                if (lhsBlock.Value.IsFile && lhsBlock.Value.AsT0.Id == file.Id)
-                {
-                    pastStart = true;
-                }
+                sum += currentChunk.AsFile.Id * index;
+                index++;
             }
-            
-
-            var space = lhsBlock.Value.AsT1;
-
-            var delta = space.Size - file.Size;
-            while (delta < 0)
-            {
-                if (lhsBlock!.Next == null)
-                {
-                    break;
-                }
-                lhsBlock = lhsBlock!.Next;
-                if (lhsBlock!.Value.IsSpace)
-                {
-                    delta = lhsBlock.Value.AsT1.Size - file.Size;
-                }
-                if (lhsBlock.Value.IsFile && lhsBlock.Value.AsT0.Id == file.Id)
-                {
-                    pastStart = true;
-                }
-                
-            }
-            
-            if (pastStart)
-            {
-                rhsBlock = rhsBlock.Previous;
-                continue;
-            }
-            
-            if (delta >= 0)
-            {
-                lhsBlock.Value = new FileBlock(file.Id, file.Size);
-                rhsBlock.Value = new SpaceBlock(file.Size);
-                if (delta > 0)
-                {
-                    OneOfBlockChunk newSpaceBlock = new SpaceBlock(delta);
-                    oneOfBlockChunks.AddAfter(lhsBlock, newSpaceBlock);
-                }
-                
-            }
-            // else
-            // {
-            //     
-            // }
-            
-            
-
-
-            // while (rhsBlock.Previous != null && rhsBlock.Value.IsSpace)
-            // {
-                // rhsBlock = rhsBlock.Previous;
-            // }
-            rhsBlock = rhsBlock.Previous;
-            
-            
-            // foreach (var block in oneOfBlockChunks)
-            // {
-            //     Console.Write(block.Debug());
-            // }
-            // Console.WriteLine();
         }
+        return sum;
+    }
 
-        long total = 0;
-        var i = 0;
-        var items = new List<long>();
-        foreach (var block in oneOfBlockChunks)
+    private LinkedListNode<OneOfBlockChunk> Find(Guid guid)
+    {
+        var current = oneOfBlockChunks.First;
+        while (current.Value.Guid() != guid)
         {
-            var blockString = block.Debug();
-            foreach (var c in blockString)
-            {
-                if (c == '.')
-                {
-                    items.Add(0);
-                }
-                else
-                {
-                    var l = long.Parse(c.ToString());
-                    items.Add(l);
-                }
-               
-            }
+            current = current.Next;
         }
 
-        Console.WriteLine(total);
-        foreach (var item in items)
+        return current;
+    }
+
+    private void Print()
+    {
+        foreach (var oneOfBlockChunk in oneOfBlockChunks)
         {
-            Console.Write(item.ToString());
+            Console.Write(oneOfBlockChunk.Debug());
         }
-        Console.WriteLine(total);
-        for (int j = 0; j < items.Count; j++)
+        Console.WriteLine();
+    }
+
+    private SpaceBlock NextEmptySpaceThatFits(LinkedListNode<OneOfBlockChunk>? first, FileBlock fileBlock)
+    {
+        var spaceBlock = NextEmptySpace(first);
+        while (!FitsInChunk(fileBlock, spaceBlock.Value!.ASpaceBlock))
         {
-            total += j * items[j];
+            spaceBlock = NextEmptySpace(spaceBlock.Next);
         }
-        
-        return total;
+        return spaceBlock.Value.ASpaceBlock;
+    }
+
+    private static bool FitsInChunk(FileBlock chunk, SpaceBlock memory)
+    {
+        return memory.Size >= chunk.Size;
+    }
+
+    private static LinkedListNode<OneOfBlockChunk> NextEmptySpace(LinkedListNode<OneOfBlockChunk>? currentChunk)
+    {
+        while (currentChunk!.Next != null && currentChunk.Value.IsFile)
+        {
+            currentChunk = currentChunk.Next;
+        }
+        return currentChunk;
     }
 
     public static Day9Solution LoadSolution(string basicInput)
@@ -262,12 +271,14 @@ public class Day9Solution(LinkedList<OneOfBlock> blocks, LinkedList<OneOfBlockCh
         var part2Input = new LinkedList<OneOfBlockChunk>();
         var blockType = BlockType.File;
         long fileId = 0;
+        long globalId = -1;
         foreach (var number in numbers)
         {
+            globalId++;
             var size = long.Parse(number.ToString());
             if (blockType == BlockType.File)
             {
-                OneOfBlockChunk chunk = new FileBlock(fileId, size);
+                OneOfBlockChunk chunk = new FileBlock(fileId, size, globalId);
                 part2Input.AddLast(chunk);
                 for (long i = 0; i < size; i++)
                 {
@@ -287,7 +298,7 @@ public class Day9Solution(LinkedList<OneOfBlock> blocks, LinkedList<OneOfBlockCh
 
                 if (size > 0)
                 {
-                    OneOfBlockChunk chunk = new SpaceBlock(size);
+                    OneOfBlockChunk chunk = new SpaceBlock(size, globalId);
                     part2Input.AddLast(chunk);
                 }
                 
