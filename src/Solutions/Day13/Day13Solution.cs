@@ -68,7 +68,45 @@ public class Day13Solution(XyGrid grid, List<XYRobot> robots, int rowSize, int c
 
     public long SolvePart2()
     {
-        throw new NotImplementedException();
+
+        var coords = new HashSet<XyCoord>();
+        for (var i = 25; i < 76; i++)
+        {
+            for (var j = 25; j < 76; j++)
+            {
+                coords.Add(new XyCoord(i, j));
+            }
+        }
+        var counter = 10000;
+        var math = new XyRobotMath(new XyCoord(rowSize, columnSize));
+        for (var i = 1; i < counter; i++)
+        {
+            
+            foreach (var robot in robots)
+            {
+                grid.Move(robot, math);
+            }
+
+            var count = coords.Sum(c => grid[c].Count);
+            // if (counter % 100000 == 0)
+            // {
+            //     Console.WriteLine(counter);
+            //     Console.WriteLine(grid.Display());
+            //     Console.WriteLine("");
+            // }
+            if (i is 7084 or 7085 or 7083 or 7082)
+            {
+                Console.WriteLine(i);
+                Console.WriteLine(grid.Display());
+            }
+            if (count > 256)
+            {
+                Console.WriteLine(i);
+                Console.WriteLine(grid.Display());
+            }
+        }
+        
+        return 1;
     }
 
     public static Day13Solution LoadSolution(string basicInput, int rowSize, int columnSize)

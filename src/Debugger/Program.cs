@@ -17,5 +17,5 @@ Console.WriteLine(fullSolution.SolvePart1());
 // Console.WriteLine("");
 // Console.WriteLine($"---{nameof(Day12Solution)}-basic-part-2---");
 // Console.WriteLine(basicSolution.SolvePart2());
-// Console.WriteLine($"---{nameof(Day12Solution)}-full-part-2---");
-// Console.WriteLine(fullSolution.SolvePart2());
+Console.WriteLine($"---{nameof(Day13Solution)}-full-part-2---");
+Console.WriteLine(fullSolution.SolvePart2());
