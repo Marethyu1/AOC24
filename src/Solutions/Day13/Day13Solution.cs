@@ -103,6 +103,7 @@ public class Day13Solution(XyGrid grid, List<XYRobot> robots, int rowSize, int c
             {
                 Console.WriteLine(i);
                 Console.WriteLine(grid.Display());
+                return i;
             }
         }
         
