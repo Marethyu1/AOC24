@@ -37,8 +37,8 @@ public class Day15Solution(XyGrid<Tile> grid, Queue<Direction> commands, XyGrid<
         for (var i = 0; i < n; i++)
         {
             wareHouse.MoveRobot();
-            Console.WriteLine(xyGrid.Display());
         }
+        xyGrid.Display();
         
         
         var sumo  = xyGrid.EnumerateCoords()

@@ -236,6 +236,7 @@ public class Day15Tests
         q.Enqueue(Direction.Down);
         q.Enqueue(Direction.Left);
         q.Enqueue(Direction.Up);
+        q.Enqueue(Direction.Up);
         var warehouse = new BigWarehouse(grid, q);
         
         warehouse.MoveRobot();
@@ -252,12 +253,65 @@ public class Day15Tests
         
         warehouse.MoveRobot();
         _testOutputHelper.WriteLine(grid.Display());
-        
-        
-        Assert.Equal(new XyCoord(7, 4), warehouse.MoveRobot());
-        _testOutputHelper.WriteLine(grid.Display());
-         
 
+        var next = warehouse.MoveRobot();
+        _testOutputHelper.WriteLine(grid.Display());
+        Assert.Equal(new XyCoord(7, 4), next);
         
+        next = warehouse.MoveRobot();
+        _testOutputHelper.WriteLine(grid.Display());
+        Assert.Equal(new XyCoord(7, 4), next);
+    }
+    
+    [Fact]
+    public void CanMoveBoxesUpMore()
+    {
+        var tiles = new[]
+        {
+            "#######".Select(Tile.ToTile).ToArray(),
+            "#.....#".Select(Tile.ToTile).ToArray(),
+            "#.OOO.#".Select(Tile.ToTile).ToArray(),
+            "#..OO@#".Select(Tile.ToTile).ToArray(),
+            "#..O..#".Select(Tile.ToTile).ToArray(),
+            "#.....#".Select(Tile.ToTile).ToArray(),
+            "#######".Select(Tile.ToTile).ToArray(),
+        };
+        var wideTiles = tiles.Select(row => row.SelectMany(Tile.ToWideTile).ToArray()).ToArray();
+        var grid = new XyGrid<Tile>(wideTiles);
+        
+        _testOutputHelper.WriteLine(grid.Display());
+        var q = new Queue<Direction>();
+        q.Enqueue(Direction.Left);
+        q.Enqueue(Direction.Down);
+        q.Enqueue(Direction.Left);
+        q.Enqueue(Direction.Down);
+        q.Enqueue(Direction.Left);
+        q.Enqueue(Direction.Up);
+        q.Enqueue(Direction.Up);
+        var warehouse = new BigWarehouse(grid, q);
+        
+        warehouse.MoveRobot();
+        _testOutputHelper.WriteLine(grid.Display());
+        
+        warehouse.MoveRobot();
+        _testOutputHelper.WriteLine(grid.Display());
+        
+        warehouse.MoveRobot();
+        _testOutputHelper.WriteLine(grid.Display());
+        
+        warehouse.MoveRobot();
+        _testOutputHelper.WriteLine(grid.Display());
+        
+        warehouse.MoveRobot();
+        _testOutputHelper.WriteLine(grid.Display());
+
+        var next = warehouse.MoveRobot();
+        _testOutputHelper.WriteLine(grid.Display());
+        Assert.Equal(new XyCoord(7, 4), next);
+        Assert.Equal(TileValue.Space, grid[new XyCoord(7, 5)].Value);
+        
+        next = warehouse.MoveRobot();
+        _testOutputHelper.WriteLine(grid.Display());
+        Assert.Equal(new XyCoord(7, 4), next);
     }
 }

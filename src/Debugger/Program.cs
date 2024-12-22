@@ -18,5 +18,5 @@ var fullSolution = Day15Solution.LoadSolution(fullInputFile);
 Console.WriteLine("");
 Console.WriteLine($"---{nameof(Day13Solution)}-basic-part-2---");
 Console.WriteLine(basicSolution.SolvePart2());
-// Console.WriteLine($"---{nameof(Day13Solution)}-full-part-2---");
-// Console.WriteLine(fullSolution.SolvePart2());
+Console.WriteLine($"---{nameof(Day13Solution)}-full-part-2---");
+Console.WriteLine(fullSolution.SolvePart2());
