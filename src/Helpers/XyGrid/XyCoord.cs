@@ -19,4 +19,9 @@ public record XyCoord(int TilesFromLeftWall, int TilesFromTopWall)
             _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
     }
+    
+    public IEnumerable<XyCoord> AdjacentCoords(Direction[] directions)
+    {
+        return directions.Select(Next);
+    }
 };
