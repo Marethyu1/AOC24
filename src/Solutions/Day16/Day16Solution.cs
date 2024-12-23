@@ -14,7 +14,8 @@ public class Day16Solution(XyGrid<MazeTile> xyGrid) : ISolution
 
     public long SolvePart2()
     {
-        throw new NotImplementedException();
+        var solver = new MazeSolver(xyGrid, Console.WriteLine);
+        return solver.SolvePart2();
     }
 
     public static Day16Solution LoadSolution(string filePath)

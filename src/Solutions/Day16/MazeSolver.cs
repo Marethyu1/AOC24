@@ -19,10 +19,11 @@ internal record Location(XyCoord CurrentCoord, Direction Facing)
 public class MazeSolver
 {
     private readonly XyGrid<MazeTile> _grid;
-    private readonly Action<string> _log;
+    private Action<string> _log;
     private readonly XyCoord _startPoint;
     private const Direction StartFacing = Direction.Right;
     private Location _startLocation;
+    private XyCoord _endPoint;
     private const TileValue StartTileValue = TileValue.Start;
 
     private readonly Direction[] _directions =
@@ -40,6 +41,7 @@ public class MazeSolver
         _log = log;
         _startPoint = FindStart();
         _startLocation = new Location(_startPoint, StartFacing);
+        _endPoint = _grid.EnumerateCoords().First(c => _grid[c].Value == TileValue.End);
     }
 
     public XyCoord FindStart()
@@ -62,11 +64,11 @@ public class MazeSolver
         while (queue.Count > 0)
         {
             var currentLocation = queue.Dequeue();
-            _log($"Processing {currentLocation} [{score[currentLocation]}]");
+            // _log($"Processing {currentLocation} [{score[currentLocation]}]");
             if (_grid[currentLocation.CurrentCoord].Value == TileValue.End)
             {
-                _log($"\tFound end of {currentLocation.CurrentCoord}");
-                _log($"\tScore: {score[currentLocation]}");
+                // _log($"\tFound end of {currentLocation.CurrentCoord}");
+                // _log($"\tScore: {score[currentLocation]}");
                 return score[currentLocation];
             };
             
@@ -74,7 +76,7 @@ public class MazeSolver
             {
                 foreach (var location in GenerateMoves(currentLocation))
                 {
-                    _log($"\tAdding {location}");
+                    // _log($"\tAdding {location}");
                     
                     if (location.Facing == currentLocation.Facing)
                     {
@@ -89,33 +91,38 @@ public class MazeSolver
             }
             else
             {
-                _log($"\tAlready Visited {currentLocation}");
+                // _log($"\tAlready Visited {currentLocation}");
             }
             
         }
-        _log("end");
+        // _log("end");
         return -1;
     }
 
     public long SolvePart2()
     {
+        
         var scoreToReach = Solve();
         _log($"Target score: {scoreToReach}");
         
         var queue = new PriorityQueue<Location, int>();
         var moves = new HashSet<Location>();
-        var movesToSolution = new HashSet<Location>();
+        var visits = new Dictionary<XyCoord, XyCoord>();
+        var allVisits = new List<Location>();
         var score = new Dictionary<Location, int>();
+        
 
         var initialMove = new Location(_startPoint, StartFacing);
-        movesToSolution.Add(initialMove);
+        
         score[initialMove] = 0;
         queue.Enqueue(initialMove, score[initialMove]);
         
+        var previousLocation = initialMove;
         while (queue.Count > 0)
         {
             var currentLocation = queue.Dequeue();
-            _log($"Processing {currentLocation} [{score[currentLocation]}]");
+            
+            _log($"Visiting {currentLocation} [{score[currentLocation]}]");
             if (_grid[currentLocation.CurrentCoord].Value == TileValue.End)
             {
                 _log($"\tFound end of {currentLocation.CurrentCoord}");
@@ -123,10 +130,10 @@ public class MazeSolver
             };
 
             var isNewLocation = moves.Add(currentLocation); 
-            movesToSolution.Add(currentLocation);
             
             if (isNewLocation)
             {
+                allVisits.Add(currentLocation);
                 foreach (var location in GenerateMoves(currentLocation))
                 {
                     _log($"\tAdding {location}");
@@ -140,15 +147,8 @@ public class MazeSolver
                         score[location] = score[currentLocation] + 1000;
                     }
                     
-                    if (score[location] < scoreToReach)
-                    {
-                        queue.Enqueue(location, score[location]);
-                    }
-                    else
-                    {
-                        movesToSolution.Remove(location);
-                    }
-                        
+                    queue.Enqueue(location, score[location]);
+                           
                 }
             }
             else
@@ -158,8 +158,15 @@ public class MazeSolver
             
         }
         _log("end");
-        return -1;
-        
+        foreach (var location in allVisits)
+        {
+            _log($"\tvisited {location}");
+        }
+        var alluniqueVisits = allVisits.
+                Select(x => x.CurrentCoord)
+                .Distinct()
+                .Count();
+        return alluniqueVisits;
     }
 
     private Location[] GenerateMoves(Location currentLocation)

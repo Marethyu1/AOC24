@@ -42,6 +42,22 @@ public class Day16Tests
         
         Assert.Equal(5, solver.SolvePart2());
     }
+    
+    [Fact]
+    public void IgnoresUpwardsWalk()
+    {
+        var rawInput = new List<string>
+        {
+            "#######",
+            "#.#####",
+            "#S...E#",
+            "#######",
+        };
+        var solver = ToMazeSolver(rawInput);
+        _testOutputHelper.WriteLine(solver.Display());
+        
+        Assert.Equal(5, solver.SolvePart2());
+    }
 
     private MazeSolver ToMazeSolver(List<string> lines)
     {
